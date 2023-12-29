@@ -56,6 +56,9 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
         canvas.height = height * ratio;
 
         context.scale(ratio, ratio);
+      } else {
+        canvas.width = width;
+        canvas.height = height;
       }
 
       canvas.style.width = width + "px";

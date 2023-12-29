@@ -2,34 +2,56 @@ import { useRef, useState } from "react";
 import { useCanvas } from "react-use-canvas";
 
 const vertexShaderSource = `#version 300 es
-precision highp float;
 
-out vec2 texCoord;
+in vec4 a_position;
 
 void main() {
-  float x = float((gl_VertexID & 1) << 2);
-  float y = float((gl_VertexID & 2) << 1);
-  texCoord.x = x * 0.5;
-  texCoord.y = y * 0.5;
-  gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
+  gl_Position = a_position;
 }
 `;
 
+// Made by kishimisu
+// https://www.shadertoy.com/view/mtyGWy
 const fragmentShaderSource = `#version 300 es
 precision highp float;
 
-in vec2 texCoord;
-
+uniform vec2 u_resolution;
 uniform float u_time;
 
 layout (location = 0) out vec4 outColor;
 
+vec3 palette( float t ) {
+  vec3 a = vec3(0.5, 0.5, 0.5);
+  vec3 b = vec3(0.5, 0.5, 0.5);
+  vec3 c = vec3(1.0, 1.0, 1.0);
+  vec3 d = vec3(0.263,0.416,0.557);
+
+  return a + b * cos(6.28318 * (c * t + d));
+}
+
 void main() {
-   outColor = vec4(
-    abs(cos(u_time / 100.0)),
-    texCoord.y,
-    abs(sin(u_time / 100.0)
-  ), 1.0);
+  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y;
+
+  vec2 uv0 = uv;
+
+  vec3 finalColor = vec3(0.0);
+
+  for (float i = 0.0; i < 4.0; i++) {
+    uv = fract(uv * 1.5) - 0.5;
+
+    float d = length(uv) * exp(-length(uv0));
+
+    vec3 col = palette(length(uv0) + i * .4 + (u_time / 100.0) * .4);
+
+    d = sin(d * 8. + u_time / 100.0) / 8.;
+    d = abs(d);
+
+    d = pow(0.01 / d, 1.2);
+
+    finalColor += col * d;
+  }
+
+  outColor = vec4(finalColor, 1.0);
 }
 `;
 
@@ -61,9 +83,18 @@ function createProgram(gl, vertexShader, fragmentShader) {
   return program;
 }
 
+function createUniform(gl, program, type, name) {
+  const location = gl.getUniformLocation(program, name);
+  return (...values) => {
+    gl[`uniform${type}`](location, ...values);
+  };
+}
+
 export function Example04() {
-  const programRef = useRef(null);
-  const bufferRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  let uniformTime = null;
+  let uniformResolution = null;
 
   const setup = ({ context: gl, width, height }) => {
     const vertexShader = compileShader(
@@ -78,21 +109,49 @@ export function Example04() {
       gl.FRAGMENT_SHADER,
     );
 
-    programRef.current = createProgram(gl, vertexShader, fragmentShader);
+    const program = createProgram(gl, vertexShader, fragmentShader);
 
-    gl.useProgram(programRef.current);
+    const positionAttributeLocation = gl.getAttribLocation(
+      program,
+      "a_position",
+    );
+
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    gl.bufferData(
+      gl.ARRAY_BUFFER,
+      new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+      gl.STATIC_DRAW,
+    );
+
+    gl.enableVertexAttribArray(positionAttributeLocation);
+    gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.viewport(0, 0, width, height);
+
+    uniformTime = createUniform(gl, program, "1f", "u_time");
+    uniformResolution = createUniform(gl, program, "2f", "u_resolution");
+
+    gl.useProgram(program);
+
+    gl.bindVertexArray(vao);
   };
 
-  const draw = ({ context: gl, time, height, width }) => {
-    const u_time = gl.getUniformLocation(programRef.current, "u_time");
-    gl.uniform1f(u_time, time);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 3);
+  const draw = ({ context: gl, time, width, height }) => {
+    uniformTime(time);
+    uniformResolution(width, height);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
   };
 
   const { ref } = useCanvas({
     setup,
     draw,
     options: {
+      width: 500,
+      height: 500,
       contextType: "webgl2",
       contextAttributes: {
         antialias: true,
