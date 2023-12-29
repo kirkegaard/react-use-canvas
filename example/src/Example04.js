@@ -1,6 +1,6 @@
 import { useCanvas } from "react-use-canvas";
 
-const vertexShaderSource = `#version 300 es
+const vs = `#version 300 es
 
 in vec4 a_position;
 
@@ -11,7 +11,7 @@ void main() {
 
 // Made by kishimisu
 // https://www.shadertoy.com/view/mtyGWy
-const fragmentShaderSource = `#version 300 es
+const fs = `#version 300 es
 precision highp float;
 
 uniform vec2 u_resolution;
@@ -94,17 +94,8 @@ export function Example04() {
   let uniformResolution = null;
 
   const setup = ({ context: gl, width, height }) => {
-    const vertexShader = compileShader(
-      gl,
-      vertexShaderSource,
-      gl.VERTEX_SHADER,
-    );
-
-    const fragmentShader = compileShader(
-      gl,
-      fragmentShaderSource,
-      gl.FRAGMENT_SHADER,
-    );
+    const vertexShader = compileShader(gl, vs, gl.VERTEX_SHADER);
+    const fragmentShader = compileShader(gl, fs, gl.FRAGMENT_SHADER);
 
     const program = createProgram(gl, vertexShader, fragmentShader);
 
@@ -147,11 +138,11 @@ export function Example04() {
     setup,
     draw,
     options: {
-      width: 500,
-      height: 500,
+      height: 350,
+      width: 350,
       contextType: "webgl2",
       contextAttributes: {
-        antialias: true,
+        antialias: false,
       },
     },
   });
