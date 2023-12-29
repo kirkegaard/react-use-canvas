@@ -38,7 +38,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
       const context = getContext();
 
       if (typeof draw === "function") {
-        draw({ context, time: frameCountRef.current });
+        draw({ context, time: frameCountRef.current, height, width });
       }
     },
     [draw, getContext, fps, pause],
@@ -60,7 +60,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
       context.scale(ratio, ratio);
 
       if (typeof setup === "function") {
-        setup({ context });
+        setup({ context, height, width });
       }
       render();
     }

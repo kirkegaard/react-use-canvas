@@ -3,13 +3,11 @@ import { useCanvas } from "react-use-canvas";
 import "./App.css";
 
 function Example01() {
-  const setup = ({ context }) => {
-    const { width, height } = context.canvas;
+  const setup = ({ context, height, width }) => {
     context.translate(width / 2, height / 2);
   };
 
-  const draw = ({ context, time }) => {
-    const { width, height } = context.canvas;
+  const draw = ({ context, time, height, width }) => {
     context.clearRect(-width / 2, -height / 2, width, height);
 
     const x = Math.cos(time / 20) * 100;
@@ -31,8 +29,7 @@ function Example02() {
 
   const radius = 50;
 
-  const draw = ({ context, time }) => {
-    const { width, height } = context.canvas;
+  const draw = ({ context, time, height, width }) => {
     context.clearRect(0, 0, width, height);
 
     context.save();
@@ -55,6 +52,8 @@ function Example02() {
     draw,
     options: {
       pause: !isPlaying,
+      height: 100,
+      width: 100,
     },
   });
 
