@@ -49,15 +49,17 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
       const context = getContext();
       const { canvas } = context;
 
-      const ratio = window.devicePixelRatio || 1;
+      if (contextType === "2d") {
+        const ratio = window.devicePixelRatio || 1;
 
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
+        canvas.width = width * ratio;
+        canvas.height = height * ratio;
+
+        context.scale(ratio, ratio);
+      }
 
       canvas.style.width = width + "px";
       canvas.style.height = height + "px";
-
-      context.scale(ratio, ratio);
 
       if (typeof setup === "function") {
         setup({ context, height, width });
