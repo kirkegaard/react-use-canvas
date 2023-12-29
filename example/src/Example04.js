@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { useCanvas } from "react-use-canvas";
 
 const vertexShaderSource = `#version 300 es
@@ -62,7 +61,7 @@ function compileShader(gl, shaderSource, shaderType) {
 
   const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
   if (!success) {
-    throw "could not compile shader:" + gl.getShaderInfoLog(shader);
+    throw Error(`Could not compile shader: ${gl.getShaderInfoLog(shader)}`);
   }
 
   return shader;
@@ -77,7 +76,7 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
   const success = gl.getProgramParameter(program, gl.LINK_STATUS);
   if (!success) {
-    throw "program failed to link:" + gl.getProgramInfoLog(program);
+    throw Error(`Program failed to link: ${gl.getProgramInfoLog(program)}`);
   }
 
   return program;
@@ -91,8 +90,6 @@ function createUniform(gl, program, type, name) {
 }
 
 export function Example04() {
-  const [isPlaying, setIsPlaying] = useState(true);
-
   let uniformTime = null;
   let uniformResolution = null;
 
