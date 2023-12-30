@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { useCanvas } from "react-use-canvas";
 
-export function Example02() {
-  const [isPlaying, setIsPlaying] = useState(true);
-
+export function States() {
   const radius = 50;
 
   const draw = ({ context, time, height, width }) => {
@@ -25,10 +22,9 @@ export function Example02() {
     context.restore();
   };
 
-  const { ref } = useCanvas({
+  const { ref, pause, setFPS } = useCanvas({
     draw,
     options: {
-      pause: !isPlaying,
       height: 100,
       width: 100,
     },
@@ -37,14 +33,26 @@ export function Example02() {
   return (
     <div>
       <div>
-        <input
-          id="ex02pause"
+        <label htmlFor="ex02pause">pause: </label>
+        <input id="ex02pause" type="checkbox" onClick={pause} />
+      </div>
+      <div>
+        <label htmlFor="ex02fps">setFPS </label>
+        <select
+          id="ex02fps"
           type="checkbox"
-          onClick={() => {
-            setIsPlaying(!isPlaying);
+          defaultValue={120}
+          onChange={(e) => {
+            setFPS(parseInt(e.target.value));
           }}
-        />
-        <label htmlFor="ex02pause">Pause?</label>
+        >
+          <option value="5">5</option>
+          <option value="15">15</option>
+          <option value="30">30</option>
+          <option value="60">60</option>
+          <option value="120">120</option>
+          <option value="240">240</option>
+        </select>
       </div>
       <canvas ref={ref} />
     </div>

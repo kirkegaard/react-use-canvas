@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 
 export const useCanvas = ({ setup, draw, options = {} }) => {
   const canvasRef = useRef(null);
@@ -9,11 +9,13 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
   const {
     height = 250,
     width = 250,
-    fps = 120,
-    pause = false,
     contextType = "2d",
     contextAttributes = {},
+    ...otherOptions
   } = options;
+
+  const [fps, setFPS] = useState(otherOptions.fps || 120);
+  const [isPaused, setIsPaused] = useState(false);
 
   const getContext = useCallback(() => {
     const canvas = canvasRef.current;
@@ -22,7 +24,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
 
   const render = useCallback(
     (currentDelta) => {
-      if (!pause) {
+      if (!isPaused) {
         animationFrameIdRef.current = window.requestAnimationFrame(render);
       }
 
@@ -38,10 +40,17 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
       const context = getContext();
 
       if (typeof draw === "function") {
-        draw({ context, time: frameCountRef.current, height, width });
+        draw({
+          context,
+          time: frameCountRef.current,
+          height,
+          width,
+          fps,
+          isPaused,
+        });
       }
     },
-    [draw, getContext, fps, pause],
+    [draw, getContext, fps, isPaused],
   );
 
   useEffect(() => {
@@ -73,5 +82,12 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
     return () => window.cancelAnimationFrame(animationFrameIdRef.current);
   }, [canvasRef, height, width, getContext, setup, draw, render]);
 
-  return { ref: canvasRef };
+  return {
+    ref: canvasRef,
+    pause: () => setIsPaused(!isPaused),
+    isPaused,
+    setIsPaused,
+    fps,
+    setFPS,
+  };
 };

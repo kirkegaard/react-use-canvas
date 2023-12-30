@@ -2,10 +2,10 @@ import { useCanvas } from "react-use-canvas";
 
 const vs = `#version 300 es
 
-in vec4 a_position;
+in vec4 position;
 
 void main() {
-  gl_Position = a_position;
+  gl_Position = position;
 }
 `;
 
@@ -17,7 +17,7 @@ precision highp float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-layout (location = 0) out vec4 outColor;
+out vec4 outColor;
 
 vec3 palette( float t ) {
   vec3 a = vec3(0.5, 0.5, 0.5);
@@ -59,8 +59,8 @@ function compileShader(gl, shaderSource, shaderType) {
   gl.shaderSource(shader, shaderSource);
   gl.compileShader(shader);
 
-  const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-  if (!success) {
+  const status = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  if (!status) {
     throw Error(`Could not compile shader: ${gl.getShaderInfoLog(shader)}`);
   }
 
@@ -74,8 +74,8 @@ function createProgram(gl, vertexShader, fragmentShader) {
 
   gl.linkProgram(program);
 
-  const success = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (!success) {
+  const status = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (!status) {
     throw Error(`Program failed to link: ${gl.getProgramInfoLog(program)}`);
   }
 
@@ -89,20 +89,16 @@ function createUniform(gl, program, type, name) {
   };
 }
 
-export function Example04() {
+export function WebGL() {
   let uniformTime = null;
   let uniformResolution = null;
 
   const setup = ({ context: gl, width, height }) => {
     const vertexShader = compileShader(gl, vs, gl.VERTEX_SHADER);
     const fragmentShader = compileShader(gl, fs, gl.FRAGMENT_SHADER);
-
     const program = createProgram(gl, vertexShader, fragmentShader);
 
-    const positionAttributeLocation = gl.getAttribLocation(
-      program,
-      "a_position",
-    );
+    const positionAttributeLocation = gl.getAttribLocation(program, "position");
 
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
