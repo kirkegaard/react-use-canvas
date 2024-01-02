@@ -1,4 +1,4 @@
-import { useCanvas } from "react-use-canvas";
+import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 export function Simple() {
   const radius = 20;

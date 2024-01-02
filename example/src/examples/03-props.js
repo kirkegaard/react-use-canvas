@@ -1,4 +1,4 @@
-import { useCanvas } from "react-use-canvas";
+import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 export function Props() {
   const draw = ({ context, time, height, width, isPaused, fps }) => {

@@ -1,4 +1,4 @@
-import { useCanvas } from "react-use-canvas";
+import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 const vs = `#version 300 es
 
