@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useRef, useEffect, useState } from "react";
 
 export const useCanvas = ({ setup, draw, options = {} }) => {
@@ -19,7 +21,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
 
   const getContext = useCallback(() => {
     const canvas = canvasRef.current;
-    return canvas.getContext(contextType, contextAttributes);
+    return canvas ? canvas.getContext(contextType, contextAttributes) : null;
   }, [canvasRef, contextType, contextAttributes]);
 
   const render = useCallback(
@@ -39,7 +41,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
 
       const context = getContext();
 
-      if (typeof draw === "function") {
+      if (context && typeof draw === "function") {
         draw({
           context,
           time: frameCountRef.current,
@@ -50,7 +52,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
         });
       }
     },
-    [draw, getContext, fps, isPaused],
+    [draw, getContext, fps, isPaused]
   );
 
   useEffect(() => {
