@@ -1,4 +1,11 @@
 {
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 11,
+    "sourceType": "module"
+  },
   "extends": [
     "eslint:recommended",
     "prettier",
@@ -10,11 +17,14 @@
     "node": true,
     "browser": true
   },
+  "settings": {
+    "react": {
+      "version": "18"
+    }
+  },
   "rules": {
-    "@next/next/no-img-element": "off",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
-    "comma-dangle": ["error", "always-multiline"],
     "no-unused-vars": [
       1,
       {

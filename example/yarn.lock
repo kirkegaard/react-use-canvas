@@ -1628,10 +1628,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@kirkegaard/react-use-canvas@^0.0.5":
-  version "0.0.5"
-  resolved "https://npm.pkg.github.com/download/@kirkegaard/react-use-canvas/0.0.5/d2b063da1cd8c2e3b914a935883fb239f75cdd4b#d2b063da1cd8c2e3b914a935883fb239f75cdd4b"
-  integrity sha512-6OYEWIDiWcl+dVxAUof4U3zxHoLi/tWdf/wVCrQccGpjaKh1ipsyaF8jO8jEshzppPyxAG+UUZyeDvnnZgrxLg==
+"@kirkegaard/react-use-canvas@^0.0.7":
+  version "0.0.7"
+  resolved "https://npm.pkg.github.com/download/@kirkegaard/react-use-canvas/0.0.7/bf3ec69de24fb05aa883236608d21f3b504c14df#bf3ec69de24fb05aa883236608d21f3b504c14df"
+  integrity sha512-EDUkBMIDVlzQ6mFG7tnmk+IRgfd6njexZUigCV+WuK5LHBDP9aLyGjQWFMqLHZtU7l+gUB9sykipIitxbo1+6A==
 
 "@leichtgewicht/ip-codec@^2.0.1":
   version "2.0.4"

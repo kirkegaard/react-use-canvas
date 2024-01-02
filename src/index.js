@@ -52,7 +52,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
         });
       }
     },
-    [draw, getContext, fps, isPaused]
+    [draw, getContext, fps, isPaused, height, width]
   );
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
     }
 
     return () => window.cancelAnimationFrame(animationFrameIdRef.current);
-  }, [canvasRef, height, width, getContext, setup, draw, render]);
+  }, [canvasRef, contextType, height, width, getContext, setup, draw, render]);
 
   return {
     ref: canvasRef,
