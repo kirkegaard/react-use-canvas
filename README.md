@@ -16,7 +16,7 @@ npm i @kirkegaard/react-use-canvas
 
 ## Examples
 
-Check the [example folder](https://github.com/kirkegaard/react-use-canvas/)
+Check the [example folder](https://github.com/kirkegaard/react-use-canvas/tree/main/example/src/examples)
 
 ## Usage
 
