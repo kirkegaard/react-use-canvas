@@ -47,9 +47,6 @@ jobs:
       - name: Build with Next.js
         working-directory: ./example
         run: yarn next build
-      - name: Static HTML export with Next.js
-        working-directory: ./example
-        run: yarn next export
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
