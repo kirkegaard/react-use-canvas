@@ -14,6 +14,10 @@
   "files": [
     "dist"
   ],
+  "homepage": "https://kirkegaard.github.io/react-use-canvas",
+  "bugs": {
+    "url": "https://github.com/kirkegaard/react-use-canvas/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kirkegaard/react-use-canvas.git"
@@ -40,13 +44,6 @@
   },
   "engines": {
     "node": ">=16.15.0"
-  },
-  "bugs": {
-    "url": "https://github.com/kirkegaard/react-use-canvas/issues"
-  },
-  "homepage": "https://kirkegaard.github.io/react-use-canvas",
-  "directories": {
-    "example": "example"
   },
   "keywords": [
     "react",

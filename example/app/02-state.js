@@ -1,3 +1,4 @@
+"use client";
 import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 export function States() {

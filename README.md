@@ -5,7 +5,7 @@ A tiny react hook for rendering canvas.
 ## Installation
 
 ```
-yarn install @kirkegaard/react-use-canvas
+yarn add @kirkegaard/react-use-canvas
 ```
 
 or

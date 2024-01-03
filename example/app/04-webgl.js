@@ -1,3 +1,4 @@
+"use client";
 import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 const vs = `#version 300 es
@@ -109,7 +110,7 @@ export function WebGL() {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
-      gl.STATIC_DRAW,
+      gl.STATIC_DRAW
     );
 
     gl.enableVertexAttribArray(positionAttributeLocation);
