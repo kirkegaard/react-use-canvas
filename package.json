@@ -16,7 +16,7 @@
   ],
   "repository": "https://github.com/kirkegaard/react-use-canvas",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "@kirkegaard:registry": "https://npm.pkg.github.com"
   },
   "license": "MIT",
   "scripts": {
