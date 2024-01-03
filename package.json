@@ -1,6 +1,6 @@
 {
   "name": "@kirkegaard/react-use-canvas",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "A tiny hook to render canvas",
   "author": "Christian Kirkegaard <christian@lowpoly.dk>",
   "main": "./dist/index.js",
@@ -14,7 +14,10 @@
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/kirkegaard/react-use-canvas",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirkegaard/react-use-canvas.git"
+  },
   "publishConfig": {
     "@kirkegaard:registry": "https://npm.pkg.github.com"
   },
@@ -37,5 +40,17 @@
   },
   "engines": {
     "node": ">=16.15.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/kirkegaard/react-use-canvas/issues"
+  },
+  "homepage": "https://github.com/kirkegaard/react-use-canvas#readme",
+  "directories": {
+    "example": "example"
+  },
+  "keywords": [
+    "react",
+    "canvas",
+    "hook"
+  ]
 }
