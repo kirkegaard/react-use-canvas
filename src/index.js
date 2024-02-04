@@ -63,13 +63,13 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
       if (contextType === "2d") {
         const ratio = window.devicePixelRatio || 1;
 
-        canvas.width = width * ratio;
-        canvas.height = height * ratio;
+        canvas.setAttribute("width", width * ratio);
+        canvas.setAttribute("height", height * ratio);
 
         context.scale(ratio, ratio);
       } else {
-        canvas.width = width;
-        canvas.height = height;
+        canvas.setAttribute("width", width);
+        canvas.setAttribute("height", height);
       }
 
       canvas.style.width = width + "px";
