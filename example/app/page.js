@@ -2,6 +2,7 @@ import { Simple } from "./01-simple";
 import { States } from "./02-state";
 import { Props } from "./03-props";
 import { WebGL } from "./04-webgl";
+import { Game } from "./05-game";
 
 import styles from "./page.module.css";
 
@@ -63,6 +64,11 @@ export default function Home() {
           you'll have to write your own. Or copy the one from the example :)
         </p>
         <WebGL />
+      </section>
+      <section>
+        <h2>Game</h2>
+        <p>You can even make games! Although its probably not practical :D</p>
+        <Game />
       </section>
     </main>
   );
