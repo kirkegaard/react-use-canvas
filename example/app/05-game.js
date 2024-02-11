@@ -36,7 +36,9 @@ export function Game() {
   let BULLETS = [];
   let PLAYER;
 
-  const State = {};
+  const State = {
+    gameOver: true,
+  };
 
   const Alien = (options, context) => {
     let { x, y, size = 10 } = options;
@@ -110,6 +112,7 @@ export function Game() {
   const setup = ({ context, height, width }) => {
     // Make sure the enemies array is empty because rerender things :(
     ENEMIES = [];
+    BULLETS = [];
 
     PLAYER = Ship(
       { x: width / 2, y: height - 20, speed: 2, size: 20 },
@@ -135,6 +138,24 @@ export function Game() {
     context.strokeStyle = "white";
     context.stroke();
     context.closePath();
+
+    if (ENEMIES.length <= 0) {
+      // Reset
+      setup({ context, height, width });
+      State.gameOver = true;
+    }
+
+    if (State.gameOver) {
+      if (input.current.includes("Enter")) {
+        State.gameOver = false;
+      }
+
+      context.textAlign = "center";
+      context.font = "20px arial";
+      context.fillStyle = "white";
+      context.fillText("Press enter to start game", width / 2, height / 2);
+      return;
+    }
 
     PLAYER.update({ height, width });
     PLAYER.draw({ height, width });
