@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Simple } from "./01-simple";
 import { States } from "./02-state";
 import { Props } from "./03-props";
@@ -62,6 +63,10 @@ export default function Home() {
           <a href="https://www.shadertoy.com/view/mtyGWy">kishimisu</a>. I do
           have plans for integrating a proper pipeline in the hook but for now
           you'll have to write your own. Or copy the one from the example :)
+        </p>
+        <p>
+          I've also added <Link href="/midi">another example</Link> where you
+          can use midi controllers to control the shader.
         </p>
         <WebGL />
       </section>

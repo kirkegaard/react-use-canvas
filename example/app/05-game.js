@@ -166,20 +166,6 @@ export function Game() {
     for (const [enemyIdx, enemy] of ENEMIES.entries()) {
       const enemyProps = enemy.getProps();
 
-      // Check if any bullets are hitting the enemy
-      for (const [bulletIdx, bullet] of BULLETS.entries()) {
-        const bulletProps = bullet.getProps();
-        if (
-          enemyProps.y + enemyProps.size >= bulletProps.y &&
-          enemyProps.y - enemyProps.size <= bulletProps.y &&
-          enemyProps.x + enemyProps.size >= bulletProps.x &&
-          enemyProps.x - enemyProps.size <= bulletProps.x
-        ) {
-          BULLETS.splice(bulletIdx, 1);
-          ENEMIES.splice(enemyIdx, 1);
-        }
-      }
-
       // If enemy reaches the end end the game
       if (enemyProps.y >= height - enemyProps.size) {
         State.gameOver = true;
@@ -191,6 +177,20 @@ export function Game() {
 
     for (const [bulletIdx, bullet] of BULLETS.entries()) {
       const bulletProps = bullet.getProps();
+
+      // Check if any bullets are hitting the enemy
+      for (const [enemyIdx, enemy] of ENEMIES.entries()) {
+        const enemyProps = enemy.getProps();
+        if (
+          enemyProps.y + enemyProps.size >= bulletProps.y &&
+          enemyProps.y - enemyProps.size <= bulletProps.y &&
+          enemyProps.x + enemyProps.size >= bulletProps.x &&
+          enemyProps.x - enemyProps.size <= bulletProps.x
+        ) {
+          BULLETS.splice(bulletIdx, 1);
+          ENEMIES.splice(enemyIdx, 1);
+        }
+      }
 
       if (bulletProps.y <= 0) {
         BULLETS.splice(bulletIdx, 1);
