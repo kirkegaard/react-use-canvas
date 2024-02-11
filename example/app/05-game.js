@@ -41,11 +41,14 @@ export function Game() {
   };
 
   const Alien = (options, context) => {
-    let { x, y, size = 10 } = options;
+    let { x, y, size = 10, speed = 2 } = options;
 
     const getProps = () => ({ x, y, size });
 
-    const update = () => {};
+    const update = ({ time }) => {
+      x += Math.sin(time * 0.05) / 2;
+      y += 0.25;
+    };
 
     const draw = () => {
       context.beginPath();
@@ -162,6 +165,8 @@ export function Game() {
 
     for (const [enemyIdx, enemy] of ENEMIES.entries()) {
       const enemyProps = enemy.getProps();
+
+      // Check if any bullets are hitting the enemy
       for (const [bulletIdx, bullet] of BULLETS.entries()) {
         const bulletProps = bullet.getProps();
         if (
@@ -175,7 +180,12 @@ export function Game() {
         }
       }
 
-      enemy.update();
+      // If enemy reaches the end end the game
+      if (enemyProps.y >= height - enemyProps.size) {
+        State.gameOver = true;
+      }
+
+      enemy.update({ time });
       enemy.draw();
     }
 
