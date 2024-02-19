@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 
 import { useWindowSize } from "@uidotdev/usehooks";
@@ -14,10 +14,6 @@ export const randomFloat = (min, max) => {
   return Math.random() * (max - min) + min;
 };
 
-export const normalize = (val, min, max) => {
-  return (val - min) / (max - min);
-};
-
 const Input = styled.input`
   display: flex;
   width: 100%;
@@ -28,6 +24,13 @@ const Button = styled.button`
   border: 0;
   outline: 0;
   border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  &:focus {
+    outline: 2px solid yellow;
+  }
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
 `;
 
 const Canvas = styled.canvas`
@@ -40,7 +43,7 @@ const Canvas = styled.canvas`
 let PARTICLES = [];
 
 export const Confetti = () => {
-  const [particleCount, setParticleCount] = useState(250);
+  const particleCount = useRef(250);
   const contextRef = useRef(null);
 
   const W = 10;
@@ -65,7 +68,6 @@ export const Confetti = () => {
       context.rotate(r);
 
       context.beginPath();
-      // context.arc(x, y, SIZE, 0, 2 * Math.PI);
       context.rect(0, 0, W, H);
 
       context.fillStyle = `hsl(43, 97%, ${color}%)`;
@@ -131,16 +133,18 @@ export const Confetti = () => {
 
   return (
     <div>
-      <p>Particles: {particleCount}</p>
+      <p>Particles</p>
       <Input
         type="range"
         min="1"
         max="1000"
-        defaultValue={particleCount}
-        onChange={(e) => setParticleCount(e.target.value)}
+        defaultValue={particleCount.current}
+        onChange={(e) => {
+          particleCount.current = e.target.value;
+        }}
       />
-      <Button onClick={() => addParticles(particleCount)}>
-        Fire the confetti cannon
+      <Button onClick={() => addParticles(particleCount.current)}>
+        Add particles
       </Button>
       <Canvas ref={ref} />
     </div>
