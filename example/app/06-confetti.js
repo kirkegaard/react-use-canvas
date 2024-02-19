@@ -43,7 +43,7 @@ const Canvas = styled.canvas`
 let PARTICLES = [];
 
 export const Confetti = () => {
-  const particleCount = useRef(250);
+  const particleCount = useRef(350);
   const contextRef = useRef(null);
 
   const W = 10;
@@ -89,12 +89,12 @@ export const Confetti = () => {
       PARTICLES.push(
         Particle(contextRef.current, {
           x: randomFloat(SIZE * 2, width - SIZE * 2),
-          y: -SIZE,
+          y: randomFloat(-SIZE, -50),
           r: (randomFloat(0, 360) * Math.PI) / 180,
           color: randomInteger(30, 80), // actually light but hsl
-          velocityX: randomFloat(-1, 1),
-          velocityY: randomFloat(-3, -2),
-          gravity: randomFloat(0.02, 0.1),
+          velocityX: randomFloat(-4, 4),
+          velocityY: randomFloat(-8, -2),
+          gravity: randomFloat(0.05, 0.5),
         })
       );
     }
@@ -109,7 +109,7 @@ export const Confetti = () => {
 
     for (const [idx, particle] of PARTICLES.entries()) {
       const { x, y } = particle.getProps();
-      if (x < 0 || x > width || y > height) {
+      if (x < -SIZE || x > width + SIZE || y > height) {
         PARTICLES.splice(idx, 1);
       }
 
