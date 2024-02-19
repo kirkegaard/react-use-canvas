@@ -4,6 +4,7 @@ import { States } from "./02-state";
 import { Props } from "./03-props";
 import { WebGL } from "./04-webgl";
 import { Game } from "./05-game";
+import { Confetti } from "./06-confetti";
 
 import styles from "./page.module.css";
 
@@ -74,6 +75,11 @@ export default function Home() {
         <h2>Game</h2>
         <p>You can even make games! Although its probably not practical :D</p>
         <Game />
+      </section>
+      <section>
+        <h2>Confetti</h2>
+        <p>How about some confetti</p>
+        <Confetti />
       </section>
     </main>
   );
