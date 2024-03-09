@@ -52,7 +52,7 @@ export const Confetti = () => {
 
   const Particle = (context, opt) => {
     const orig = opt;
-    let { x, y, r, velocityX, velocityY, gravity, color } = opt;
+    let { x, y, r, velocityX, velocityY, gravity, color, type } = opt;
 
     const update = (time, width, height) => {
       x += velocityX;
@@ -66,9 +66,15 @@ export const Confetti = () => {
       context.translate(x, y);
 
       context.rotate(r);
-
       context.beginPath();
-      context.rect(0, 0, W, H);
+
+      if (type === 1) {
+        context.rect(0, 0, W, H);
+      }
+
+      if (type === 2) {
+        context.arc(W, H, 2, 0 * Math.PI, 2 * Math.PI);
+      }
 
       context.fillStyle = `hsl(43, 97%, ${color}%)`;
       context.fill();
@@ -95,6 +101,7 @@ export const Confetti = () => {
           velocityX: randomFloat(-4, 4),
           velocityY: randomFloat(-8, -2),
           gravity: randomFloat(0.05, 0.5),
+          type: randomInteger(1, 2),
         })
       );
     }

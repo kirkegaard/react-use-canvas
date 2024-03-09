@@ -5,6 +5,7 @@ import { Props } from "./03-props";
 import { WebGL } from "./04-webgl";
 import { Game } from "./05-game";
 import { Confetti } from "./06-confetti";
+import { BounceText } from "./07-bounce-text";
 
 import styles from "./page.module.css";
 
@@ -79,8 +80,13 @@ export default function Home() {
       </section>
       <section>
         <h2>Confetti</h2>
-        <p>How about some confetti</p>
+        <p>How about some confetti?</p>
         <Confetti />
+      </section>
+      <section>
+        <h2>Bouncing text</h2>
+        <p>Or maybe some bouncing demo like text</p>
+        <BounceText />
       </section>
     </main>
   );
