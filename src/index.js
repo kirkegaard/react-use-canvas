@@ -58,27 +58,29 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
   useEffect(() => {
     if (canvasRef.current) {
       const context = getContext();
-      const { canvas } = context;
+      if (context) {
+        const { canvas } = context;
 
-      if (contextType === "2d") {
-        const ratio = window.devicePixelRatio || 1;
+        if (contextType === "2d") {
+          const ratio = window.devicePixelRatio || 1;
 
-        canvas.setAttribute("width", width * ratio);
-        canvas.setAttribute("height", height * ratio);
+          canvas.setAttribute("width", width * ratio);
+          canvas.setAttribute("height", height * ratio);
 
-        context.scale(ratio, ratio);
-      } else {
-        canvas.setAttribute("width", width);
-        canvas.setAttribute("height", height);
+          context.scale(ratio, ratio);
+        } else {
+          canvas.setAttribute("width", width);
+          canvas.setAttribute("height", height);
+        }
+
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        if (typeof setup === "function") {
+          setup({ context, height, width });
+        }
+        render();
       }
-
-      canvas.style.width = width + "px";
-      canvas.style.height = height + "px";
-
-      if (typeof setup === "function") {
-        setup({ context, height, width });
-      }
-      render();
     }
 
     return () => window.cancelAnimationFrame(animationFrameIdRef.current);
