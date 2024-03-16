@@ -10,48 +10,72 @@ void main() {
 }
 `;
 
-// Made by kishimisu
-// https://www.shadertoy.com/view/mtyGWy
 const fs = `#version 300 es
 precision highp float;
 
-uniform vec2 u_resolution;
-uniform float u_time;
-
 out vec4 outColor;
 
-vec3 palette( float t ) {
-  vec3 a = vec3(0.5, 0.5, 0.5);
-  vec3 b = vec3(0.5, 0.5, 0.5);
-  vec3 c = vec3(1.0, 1.0, 1.0);
-  vec3 d = vec3(0.263,0.416,0.557);
+uniform float u_time;
+uniform vec2 u_resolution;
 
-  return a + b * cos(6.28318 * (c * t + d));
+#define PI 3.141592653589793;
+
+float box2(vec2 p,vec2 b) {
+    p = abs(p)-b;
+    return length(max(vec2(0.),p))+min(0.,max(p.x,p.y));
+}
+
+vec3 erot(vec3 p, vec3 ax, float t) {
+  return mix(dot(ax,p)*ax,p,cos(t))+cross(ax,p)*sin(t);
 }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / u_resolution.y;
+    vec2 uv = (gl_FragCoord.xy - .5 * u_resolution.xy) / u_resolution.y;
 
-  vec2 uv0 = uv;
+    vec3 col = vec3(0);
+    vec3 p, d = normalize(vec3(uv, .75));
 
-  vec3 finalColor = vec3(0.0);
+    for(float i = 0., e = 0., j = 0.; i++ < 35.0 * 1.0;) {
+      p = d * j / 0.6;
+      p.z += 1.0 + u_time / 1. * 0.006;
+      p.xy -= PI;
+      p = asin(sin(p / 2.) * .8) * 1.2;
+      float sc = .4 * 0.65;
 
-  for (float i = 0.0; i < 4.0; i++) {
-    uv = fract(uv * 1.5) - 0.5;
+      for(float j = 0.0; j++ < 7.;) {
+        p.xy = abs(p.xy) - .35;
+        p.xy *= 1. + 0.195;
+        p = erot(p, normalize(vec3(
+          0.28,
+          0.0,
+          1.
+        )), -0.785);
+        sc *= 1.25;
+      }
 
-    float d = length(uv) * exp(-length(uv0));
+      float h = box2(
+        erot(
+          p,
+          vec3(.0, .0, 1.25),
+          floor(1.0 + length(uv * uv) + pow(dot(uv, uv), 1.0) * .5)).xy,
+          vec2(.01)
+        );
 
-    vec3 col = palette(length(uv0) + i * .4 + (u_time / 100.0) * .4);
+      h = min(h, box2(p.xz, vec2(0.1 / 2.0)));
+      h = min(h, box2(p.yz, vec2(0.1 / 2.0)));
+      h /= sc;
+      j += e = max(.001, h);
 
-    d = sin(d * 8. + u_time / 100.0) / 8.;
-    d = abs(d);
+      col += (.8 + .3 * cos(vec3(.075, 2.1, .16) * i + floor(1. / 10. + length(uv * uv)))) * .1 / exp((.8 + p.z * .01) * i * i * e);
+    }
 
-    d = pow(0.01 / d, 1.2);
+    float r = 0.0 * (1.0 + 0.88);
+    float g = 0.4 * (1.0 + 0.08);
+    float b = 0.5 * (1.0 + 0.18);
 
-    finalColor += col * d;
-  }
+    col *= vec3(r, g, b);
 
-  outColor = vec4(finalColor, 1.0);
+    outColor = vec4(col, 1.0);
 }
 `;
 
@@ -98,7 +122,6 @@ export function WebGL() {
     const vertexShader = compileShader(gl, vs, gl.VERTEX_SHADER);
     const fragmentShader = compileShader(gl, fs, gl.FRAGMENT_SHADER);
     const program = createProgram(gl, vertexShader, fragmentShader);
-
     const positionAttributeLocation = gl.getAttribLocation(program, "position");
 
     const vao = gl.createVertexArray();
@@ -106,7 +129,6 @@ export function WebGL() {
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
@@ -121,7 +143,6 @@ export function WebGL() {
     uniformResolution = createUniform(gl, program, "2f", "u_resolution");
 
     gl.useProgram(program);
-
     gl.bindVertexArray(vao);
   };
 
@@ -135,8 +156,8 @@ export function WebGL() {
     setup,
     draw,
     options: {
-      height: 350,
-      width: 350,
+      height: 500,
+      width: 355,
       contextType: "webgl2",
       contextAttributes: {
         antialias: false,

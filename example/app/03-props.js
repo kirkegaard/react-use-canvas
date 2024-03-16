@@ -26,7 +26,7 @@ export function Props() {
   return (
     <div>
       <div>
-        <label htmlFor="ex03pause">Is paused:</label>
+        <label htmlFor="ex03pause">Is paused: </label>
         <input
           id="ex03pause"
           type="checkbox"

@@ -91,7 +91,7 @@ export function Game() {
       if (input.current.includes("ArrowRight")) {
         x = x >= width - size ? width - size : x + speed;
       }
-      if (input.current.includes(" ")) {
+      if (input.current.includes("a")) {
         if (!isShooting) {
           isShooting = true;
           BULLETS.push(Bullet({ x: x, y }, context));

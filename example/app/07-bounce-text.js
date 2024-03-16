@@ -2,7 +2,7 @@
 import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 export function BounceText() {
-  const string = "REACT CANVAS";
+  const string = "CANVAS<3";
   const size = 42;
   const spacing = 4;
   const trail = 10;

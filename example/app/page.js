@@ -61,15 +61,13 @@ export default function Home() {
         <h2>WebGL</h2>
         <p>
           If you&apos;re willing to write a shader pipeline, you can even use it
-          to render shaders! Here&apos;s one created by{" "}
-          <a href="https://www.shadertoy.com/view/mtyGWy">kishimisu</a>. I do
-          have plans for integrating a proper pipeline in the hook but for now
-          you&apos;ll have to write your own. Or copy the one from the example
-          :)
-        </p>
-        <p>
-          I&apos;ve also added <Link href="/midi">another example</Link> where
-          you can use midi controllers to control the shader.
+          to render shaders!{" "}
+          <a href="https://www.instagram.com/p/C3Oh8Nwst0z/">
+            Here&apos;s an old one from some time ago
+          </a>
+          . I do have plans for integrating a proper pipeline in the hook but
+          for now you&apos;ll have to write your own. Or copy the one from the
+          examples :)
         </p>
         <WebGL />
       </section>
