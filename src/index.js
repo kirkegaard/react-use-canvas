@@ -81,7 +81,7 @@ export const useCanvas = ({ setup, draw, options = {} }) => {
         }
         render();
       } else {
-        throw Error(
+        console.error(
           `Unable to get context of type "${contextType}". Is webgl enabled?`
         );
       }
