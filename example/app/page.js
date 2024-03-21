@@ -6,6 +6,7 @@ import { WebGL } from "./04-webgl";
 import { Game } from "./05-game";
 import { Confetti } from "./06-confetti";
 import { BounceText } from "./07-bounce-text";
+import { Math } from "./08-math";
 
 import styles from "./page.module.css";
 
@@ -74,6 +75,7 @@ export default function Home() {
       <section>
         <h2>Game</h2>
         <p>You can even make games! Although its probably not practical :D</p>
+        <p>Controls: Arrow and A for shooting</p>
         <Game />
       </section>
       <section>
@@ -83,8 +85,12 @@ export default function Home() {
       </section>
       <section>
         <h2>Bouncing text</h2>
-        <p>Or maybe some bouncing demo like text</p>
+        <p>Or how about some demo effects like a scroller</p>
         <BounceText />
+      </section>
+      <section>
+        <h2>Math</h2>
+        <Math />
       </section>
     </main>
   );
