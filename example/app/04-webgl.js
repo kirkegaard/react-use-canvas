@@ -132,9 +132,6 @@ export function WebGL() {
     height: 500,
     width: 355,
     contextType: "webgl2",
-    contextAttributes: {
-      antialias: false,
-    },
   });
 
   function onInit() {

@@ -1,12 +1,21 @@
 "use client";
 
-import { useCallback, useRef, useEffect, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
+
+const useIsomorphicEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export const useCanvas = ({
   duration,
   isPlaying = true,
   startAt = 0,
-  updateInterval = 0,
+  updateInterval = 1 / 120, // 120 fps
 
   onInit,
   onUpdate,
@@ -16,7 +25,6 @@ export const useCanvas = ({
   width = 250,
 
   contextType = "2d",
-  contextAttributes = {},
 }) => {
   const [time, setTime] = useState(startAt);
   const [context, setContext] = useState(null);
@@ -29,34 +37,37 @@ export const useCanvas = ({
   const previousTimeRef = useRef(null);
   const repeatTimeoutRef = useRef(null);
 
-  const loop = useCallback((time) => {
-    const timeSec = time / 1000;
-    if (previousTimeRef.current === null) {
+  const loop = useCallback(
+    (time) => {
+      const timeSec = time / 1000;
+      if (previousTimeRef.current === null) {
+        previousTimeRef.current = timeSec;
+        requestFrameRef.current = requestAnimationFrame(loop);
+        return;
+      }
+
+      const deltaTime = timeSec - previousTimeRef.current;
+      const currentElapsedTime = elapsedTimeRef.current + deltaTime;
+
       previousTimeRef.current = timeSec;
-      requestFrameRef.current = requestAnimationFrame(loop);
-      return;
-    }
+      elapsedTimeRef.current = currentElapsedTime;
 
-    const deltaTime = timeSec - previousTimeRef.current;
-    const currentElapsedTime = elapsedTimeRef.current + deltaTime;
+      const currentDisplayTime =
+        startAtRef.current +
+        (updateInterval === 0
+          ? currentElapsedTime
+          : ((currentElapsedTime / updateInterval) | 0) * updateInterval);
 
-    previousTimeRef.current = timeSec;
-    elapsedTimeRef.current = currentElapsedTime;
+      const totalTime = startAtRef.current + currentElapsedTime;
+      const isCompleted = typeof duration === "number" && totalTime >= duration;
+      setTime(isCompleted ? duration : currentDisplayTime);
 
-    const currentDisplayTime =
-      startAtRef.current +
-      (updateInterval === 0
-        ? currentElapsedTime
-        : ((currentElapsedTime / updateInterval) | 0) * updateInterval);
-
-    const totalTime = startAtRef.current + currentElapsedTime;
-    const isCompleted = typeof duration === "number" && totalTime >= duration;
-    setTime(isCompleted ? duration : currentDisplayTime);
-
-    if (!isCompleted) {
-      requestFrameRef.current = requestAnimationFrame(loop);
-    }
-  }, []);
+      if (!isCompleted) {
+        requestFrameRef.current = requestAnimationFrame(loop);
+      }
+    },
+    [duration, updateInterval]
+  );
 
   const cleanup = () => {
     requestFrameRef.current && cancelAnimationFrame(requestFrameRef.current);
@@ -78,15 +89,18 @@ export const useCanvas = ({
         requestFrameRef.current = window.requestAnimationFrame(loop);
       }
     },
-    [isPlaying, startAt]
+    [isPlaying, startAt, loop]
   );
 
-  useEffect(() => {
+  useIsomorphicEffect(() => {
+    if (context && typeof onInit === "function") {
+      onInit();
+    }
+  }, [context]);
+
+  useIsomorphicEffect(() => {
     if (canvasRef.current) {
-      const context = canvasRef.current.getContext(
-        contextType,
-        contextAttributes
-      );
+      const context = canvasRef.current.getContext(contextType);
 
       if (context) {
         if (contextType === "2d") {
@@ -107,15 +121,9 @@ export const useCanvas = ({
         console.error("Could not get context");
       }
     }
-  }, [canvasRef, height, width]);
+  }, [canvasRef, height, width, contextType]);
 
-  useEffect(() => {
-    if (context && typeof onInit === "function") {
-      onInit();
-    }
-  }, [context]);
-
-  useEffect(() => {
+  useIsomorphicEffect(() => {
     if (context && typeof onUpdate === "function") {
       onUpdate();
     }
@@ -136,9 +144,9 @@ export const useCanvas = ({
         );
       }
     }
-  }, [context, time, duration]);
+  }, [context, time, duration, onComplete, onUpdate, reset]);
 
-  useEffect(() => {
+  useIsomorphicEffect(() => {
     if (isPlaying) {
       requestFrameRef.current = window.requestAnimationFrame(loop);
     }

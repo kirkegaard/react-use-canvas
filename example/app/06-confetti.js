@@ -89,6 +89,7 @@ export const Confetti = () => {
   };
 
   const addParticles = (particleCount = 50) => {
+    if (PARTICLES.current.length >= 5000) return;
     for (let i = 0; i < particleCount; i++) {
       PARTICLES.current.push(
         Particle({
@@ -124,9 +125,6 @@ export const Confetti = () => {
     onUpdate,
     height,
     width,
-    contextAttributes: {
-      antialias: false,
-    },
   });
 
   return (

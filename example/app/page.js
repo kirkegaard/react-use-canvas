@@ -11,7 +11,7 @@ import { WebGL } from "./04-webgl";
 import { Game } from "./05-game";
 import { Confetti } from "./06-confetti";
 import { BounceText } from "./07-bounce-text";
-// import { Math } from "./08-math";
+import { Math } from "./08-math";
 
 import styles from "./page.module.css";
 
@@ -127,12 +127,10 @@ export default function Home() {
         <p>Or how about some demo effects like a scroller</p>
         <BounceText />
       </section>
+      <section>
+        <h2>Math</h2>
+        <Math />
+      </section>
     </main>
   );
-  //     <section>
-  //       <h2>Math</h2>
-  //       <Math />
-  //     </section>
-  //   </main>
-  // );
 }
