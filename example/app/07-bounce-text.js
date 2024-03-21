@@ -20,18 +20,18 @@ export function BounceText() {
   const spacing = 4;
   const trail = palette.length - 1;
 
-  const setup = ({ context }) => {
+  const onInit = () => {
     context.font = "bold 50px Arial Black";
   };
 
-  const draw = ({ context, time, height, width }) => {
+  const onUpdate = () => {
     context.clearRect(0, 0, width, height);
 
     for (let i = 0; i < string.length; i++) {
       for (let j = 0; j <= trail; j++) {
-        const t = time - i * 15 + j * 2.5;
+        const t = time * 100 - i * 15 + j * 2.5;
         const y = j + Math.sin(t * 0.05) * 50;
-        const x = (size + spacing) * i - time * 2;
+        const x = (size + spacing) * i - time * 100 * 2;
         context.fillStyle = palette[j % palette.length];
         context.fillText(
           string.charAt(i),
@@ -42,10 +42,11 @@ export function BounceText() {
     }
   };
 
-  const { ref } = useCanvas({
-    setup,
-    draw,
-    options: { height: 200, width: 500 },
+  const { ref, time, context, height, width } = useCanvas({
+    onInit,
+    onUpdate,
+    height: 200,
+    width: 500,
   });
 
   return <canvas ref={ref} />;

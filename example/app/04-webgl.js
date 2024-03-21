@@ -1,4 +1,6 @@
 "use client";
+
+import { useRef } from "react";
 import { useCanvas } from "@kirkegaard/react-use-canvas";
 
 const vs = `#version 300 es
@@ -115,10 +117,27 @@ function createUniform(gl, program, type, name) {
 }
 
 export function WebGL() {
-  let uniformTime = null;
-  let uniformResolution = null;
+  const uniformTime = useRef(null);
+  const uniformResolution = useRef(null);
 
-  const setup = ({ context: gl, width, height }) => {
+  const {
+    ref,
+    time,
+    context: gl,
+    height,
+    width,
+  } = useCanvas({
+    onInit,
+    onUpdate,
+    height: 500,
+    width: 355,
+    contextType: "webgl2",
+    contextAttributes: {
+      antialias: false,
+    },
+  });
+
+  function onInit() {
     const vertexShader = compileShader(gl, vs, gl.VERTEX_SHADER);
     const fragmentShader = compileShader(gl, fs, gl.FRAGMENT_SHADER);
     const program = createProgram(gl, vertexShader, fragmentShader);
@@ -139,31 +158,23 @@ export function WebGL() {
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.viewport(0, 0, width, height);
 
-    uniformTime = createUniform(gl, program, "1f", "u_time");
-    uniformResolution = createUniform(gl, program, "2f", "u_resolution");
+    uniformTime.current = createUniform(gl, program, "1f", "u_time");
+    uniformResolution.current = createUniform(
+      gl,
+      program,
+      "2f",
+      "u_resolution"
+    );
 
     gl.useProgram(program);
     gl.bindVertexArray(vao);
-  };
+  }
 
-  const draw = ({ context: gl, time, width, height }) => {
-    uniformTime(time);
-    uniformResolution(width, height);
+  function onUpdate() {
+    uniformTime.current(time * 100);
+    uniformResolution.current(width, height);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-  };
-
-  const { ref } = useCanvas({
-    setup,
-    draw,
-    options: {
-      height: 500,
-      width: 355,
-      contextType: "webgl2",
-      contextAttributes: {
-        antialias: false,
-      },
-    },
-  });
+  }
 
   return <canvas ref={ref} />;
 }

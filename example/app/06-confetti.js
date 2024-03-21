@@ -40,21 +40,19 @@ const Canvas = styled.canvas`
   pointer-events: none;
 `;
 
-let PARTICLES = [];
-
 export const Confetti = () => {
   const particleCount = useRef(350);
-  const contextRef = useRef(null);
+  const PARTICLES = useRef([]);
 
   const W = 10;
   const H = 6;
   const SIZE = Math.max(W, H);
 
-  const Particle = (context, opt) => {
+  const Particle = (opt) => {
     const orig = opt;
     let { x, y, r, velocityX, velocityY, gravity, color, type } = opt;
 
-    const update = (time, width, height) => {
+    const update = () => {
       x += velocityX;
       y += velocityY;
       r += (velocityY * velocityX) / 180;
@@ -92,8 +90,8 @@ export const Confetti = () => {
 
   const addParticles = (particleCount = 50) => {
     for (let i = 0; i < particleCount; i++) {
-      PARTICLES.push(
-        Particle(contextRef.current, {
+      PARTICLES.current.push(
+        Particle({
           x: randomFloat(SIZE * 2, width - SIZE * 2),
           y: randomFloat(-SIZE, -50),
           r: (randomFloat(0, 360) * Math.PI) / 180,
@@ -107,34 +105,27 @@ export const Confetti = () => {
     }
   };
 
-  const setup = ({ context }) => {
-    contextRef.current = context;
-  };
-
-  const draw = ({ context, time }) => {
+  const onUpdate = () => {
     context.clearRect(0, 0, width, height);
 
-    for (const [idx, particle] of PARTICLES.entries()) {
+    for (const [idx, particle] of PARTICLES.current.entries()) {
       const { x, y } = particle.getProps();
       if (x < -SIZE || x > width + SIZE || y > height) {
-        PARTICLES.splice(idx, 1);
+        PARTICLES.current.splice(idx, 1);
       }
 
-      particle.update(time, width, height);
+      particle.update();
       particle.draw();
     }
   };
 
   const { height, width } = useWindowSize();
-  const { ref } = useCanvas({
-    setup,
-    draw,
-    options: {
-      height,
-      width,
-      contextAttributes: {
-        antialias: false,
-      },
+  const { ref, context, time } = useCanvas({
+    onUpdate,
+    height,
+    width,
+    contextAttributes: {
+      antialias: false,
     },
   });
 

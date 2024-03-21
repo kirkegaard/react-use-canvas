@@ -1,4 +1,9 @@
+"use client";
+
 import Link from "next/link";
+import { useCanvas } from "@kirkegaard/react-use-canvas";
+import { useState } from "react";
+
 import { Simple } from "./01-simple";
 import { States } from "./02-state";
 import { Props } from "./03-props";
@@ -6,9 +11,51 @@ import { WebGL } from "./04-webgl";
 import { Game } from "./05-game";
 import { Confetti } from "./06-confetti";
 import { BounceText } from "./07-bounce-text";
-import { Math } from "./08-math";
+// import { Math } from "./08-math";
 
 import styles from "./page.module.css";
+
+const Effect = () => {
+  const radius = 20;
+
+  const height = 250;
+  const width = 250;
+
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const { ref, time, reset, context } = useCanvas({
+    onInit: setup,
+    onUpdate: draw,
+    isPlaying,
+    // onComplete: () => ({ shouldRepeat: true, newStartAt: 0 }),
+    // duration: 5,
+  });
+
+  function setup() {
+    context.translate(width / 2, height / 2);
+  }
+
+  function draw() {
+    context.clearRect(-width / 2, -height / 2, width, height);
+    const x = (Math.cos(time * 1.25) * (radius * 2 - width)) / 2;
+    const y = (Math.sin(time * 2.5) * (radius * 2 - height)) / 2;
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI);
+    context.fillStyle = "white";
+    context.fill();
+  }
+
+  return (
+    <div>
+      <div>
+        <canvas ref={ref} />
+      </div>
+      <div>{Math.round(time)}</div>
+      <button onClick={() => setIsPlaying(!isPlaying)}>pause</button>
+      <button onClick={() => reset()}>reset</button>
+    </div>
+  );
+};
 
 export default function Home() {
   return (
@@ -18,6 +65,7 @@ export default function Home() {
         A tiny hook that&apos;ll help you write neat canvas things. If
         you&apos;re familiar with processing it might seem familiar.
       </p>
+
       <section>
         <h2>Simple</h2>
         <p>
@@ -34,15 +82,6 @@ export default function Home() {
       </section>
       <section>
         <h2>State</h2>
-        <p>
-          The hook exposes a few states. <samp>isPaused</samp> holds the pause
-          state. <samp>fps</samp> holds the current frames per second.
-        </p>
-        <p>
-          You&apos;ll of course also get setters for those props. Use{" "}
-          <samp>setIsPaused</samp> and <samp>setFPS</samp> to set the state
-          explicitly. Or use <samp>pause</samp> to toggle the pause state.
-        </p>
         <States />
       </section>
       <section>
@@ -88,10 +127,12 @@ export default function Home() {
         <p>Or how about some demo effects like a scroller</p>
         <BounceText />
       </section>
-      <section>
-        <h2>Math</h2>
-        <Math />
-      </section>
     </main>
   );
+  //     <section>
+  //       <h2>Math</h2>
+  //       <Math />
+  //     </section>
+  //   </main>
+  // );
 }

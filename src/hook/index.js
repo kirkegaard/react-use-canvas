@@ -2,100 +2,149 @@
 
 import { useCallback, useRef, useEffect, useState } from "react";
 
-export const useCanvas = ({ setup, draw, options = {} }) => {
+export const useCanvas = ({
+  duration,
+  isPlaying = true,
+  startAt = 0,
+  updateInterval = 0,
+
+  onInit,
+  onUpdate,
+  onComplete,
+
+  height = 250,
+  width = 250,
+
+  contextType = "2d",
+  contextAttributes = {},
+}) => {
+  const [time, setTime] = useState(startAt);
+  const [context, setContext] = useState(null);
+
   const canvasRef = useRef(null);
-  const animationFrameIdRef = useRef(null);
-  const previousDeltaRef = useRef(0);
-  const frameCountRef = useRef(0);
+  const elapsedTimeRef = useRef(0);
+  const startAtRef = useRef(startAt);
+  const totalElapsedTimeRef = useRef(startAt * -1000);
+  const requestFrameRef = useRef(null);
+  const previousTimeRef = useRef(null);
+  const repeatTimeoutRef = useRef(null);
 
-  const {
-    height = 250,
-    width = 250,
-    contextType = "2d",
-    contextAttributes = {},
-    ...otherOptions
-  } = options;
+  const loop = useCallback((time) => {
+    const timeSec = time / 1000;
+    if (previousTimeRef.current === null) {
+      previousTimeRef.current = timeSec;
+      requestFrameRef.current = requestAnimationFrame(loop);
+      return;
+    }
 
-  const [fps, setFPS] = useState(otherOptions.fps || 120);
-  const [isPaused, setIsPaused] = useState(false);
+    const deltaTime = timeSec - previousTimeRef.current;
+    const currentElapsedTime = elapsedTimeRef.current + deltaTime;
 
-  const getContext = useCallback(() => {
-    const canvas = canvasRef.current;
-    return canvas ? canvas.getContext(contextType, contextAttributes) : null;
-  }, [canvasRef, contextType, contextAttributes]);
+    previousTimeRef.current = timeSec;
+    elapsedTimeRef.current = currentElapsedTime;
 
-  const render = useCallback(
-    (currentDelta) => {
-      if (!isPaused) {
-        animationFrameIdRef.current = window.requestAnimationFrame(render);
-      }
+    const currentDisplayTime =
+      startAtRef.current +
+      (updateInterval === 0
+        ? currentElapsedTime
+        : ((currentElapsedTime / updateInterval) | 0) * updateInterval);
 
-      const delta = currentDelta - previousDeltaRef.current;
+    const totalTime = startAtRef.current + currentElapsedTime;
+    const isCompleted = typeof duration === "number" && totalTime >= duration;
+    setTime(isCompleted ? duration : currentDisplayTime);
 
-      if (delta < 1000 / fps) {
-        return;
-      }
+    if (!isCompleted) {
+      requestFrameRef.current = requestAnimationFrame(loop);
+    }
+  }, []);
 
-      previousDeltaRef.current = currentDelta;
-      frameCountRef.current++;
+  const cleanup = () => {
+    requestFrameRef.current && cancelAnimationFrame(requestFrameRef.current);
+    repeatTimeoutRef.current && clearTimeout(repeatTimeoutRef.current);
+    previousTimeRef.current = null;
+  };
 
-      const context = getContext();
+  const reset = useCallback(
+    (newStartAt) => {
+      cleanup();
 
-      if (context && typeof draw === "function") {
-        draw({
-          context,
-          time: frameCountRef.current,
-          height,
-          width,
-          fps,
-          isPaused,
-        });
+      elapsedTimeRef.current = 0;
+      const nextStartAt = typeof newStartAt === "number" ? newStartAt : startAt;
+      startAtRef.current = nextStartAt;
+
+      setTime(nextStartAt);
+
+      if (isPlaying) {
+        requestFrameRef.current = window.requestAnimationFrame(loop);
       }
     },
-    [draw, getContext, fps, isPaused, height, width]
+    [isPlaying, startAt]
   );
 
   useEffect(() => {
     if (canvasRef.current) {
-      const context = getContext();
-      if (context) {
-        const { canvas } = context;
+      const context = canvasRef.current.getContext(
+        contextType,
+        contextAttributes
+      );
 
+      if (context) {
         if (contextType === "2d") {
           const ratio = window.devicePixelRatio || 1;
-
-          canvas.setAttribute("width", width * ratio);
-          canvas.setAttribute("height", height * ratio);
-
+          canvasRef.current.setAttribute("width", width * ratio);
+          canvasRef.current.setAttribute("height", height * ratio);
           context.scale(ratio, ratio);
         } else {
-          canvas.setAttribute("width", width);
-          canvas.setAttribute("height", height);
+          canvasRef.current.setAttribute("width", width);
+          canvasRef.current.setAttribute("height", height);
         }
 
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
+        canvasRef.current.style.width = `${width}px`;
+        canvasRef.current.style.height = `${height}px`;
 
-        if (typeof setup === "function") {
-          setup({ context, height, width });
-        }
-        render();
+        setContext(context);
       } else {
-        console.error(
-          `Unable to get context of type "${contextType}". Is webgl enabled?`
+        console.error("Could not get context");
+      }
+    }
+  }, [canvasRef, height, width]);
+
+  useEffect(() => {
+    if (context && typeof onInit === "function") {
+      onInit();
+    }
+  }, [context]);
+
+  useEffect(() => {
+    if (context && typeof onUpdate === "function") {
+      onUpdate();
+    }
+
+    if (duration && time >= duration) {
+      totalElapsedTimeRef.current += duration * 1000;
+
+      const {
+        shouldRepeat = false,
+        delay = 0,
+        newStartAt,
+      } = onComplete?.(totalElapsedTimeRef.current / 1000) || {};
+
+      if (shouldRepeat) {
+        repeatTimeoutRef.current = setTimeout(
+          () => reset(newStartAt),
+          delay * 1000
         );
       }
     }
+  }, [context, time, duration]);
 
-    return () => window.cancelAnimationFrame(animationFrameIdRef.current);
-  }, [canvasRef, contextType, height, width, getContext, setup, draw, render]);
+  useEffect(() => {
+    if (isPlaying) {
+      requestFrameRef.current = window.requestAnimationFrame(loop);
+    }
 
-  return {
-    ref: canvasRef,
-    pause: () => setIsPaused(!isPaused),
-    isPaused,
-    setIsPaused,
-    fps,
-    setFPS,
-  };
+    return cleanup;
+  }, [loop, isPlaying, duration, updateInterval]);
+
+  return { ref: canvasRef, time, reset, context, height, width };
 };
