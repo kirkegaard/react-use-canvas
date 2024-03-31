@@ -39,17 +39,16 @@ export const useCanvas = ({
 
   const loop = useCallback(
     (time) => {
-      const timeSec = time / 1000;
       if (previousTimeRef.current === null) {
-        previousTimeRef.current = timeSec;
+        previousTimeRef.current = time;
         requestFrameRef.current = requestAnimationFrame(loop);
         return;
       }
 
-      const deltaTime = timeSec - previousTimeRef.current;
+      const deltaTime = time - previousTimeRef.current;
       const currentElapsedTime = elapsedTimeRef.current + deltaTime;
 
-      previousTimeRef.current = timeSec;
+      previousTimeRef.current = time;
       elapsedTimeRef.current = currentElapsedTime;
 
       const currentDisplayTime =

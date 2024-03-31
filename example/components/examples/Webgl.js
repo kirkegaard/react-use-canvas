@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { useCanvas } from "@kirkegaard/react-use-canvas";
+import { useBoundingBox } from "hooks/useBoundingBox";
 
 const vs = `#version 300 es
 
@@ -39,7 +40,8 @@ void main() {
 
     for(float i = 0., e = 0., j = 0.; i++ < 35.0 * 1.0;) {
       p = d * j / 0.6;
-      p.z += 1.0 + u_time / 1. * 0.006;
+      // p.z += 1.0 + u_time / 10. * 0.006;
+      p.z += 1.0 + u_time / 1000.;
       p.xy -= PI;
       p = asin(sin(p / 2.) * .8) * 1.2;
       float sc = .4 * 0.65;
@@ -117,6 +119,11 @@ function createUniform(gl, program, type, name) {
 }
 
 export function WebGL() {
+  const viewportRef = useRef(null);
+  const bounds = useBoundingBox({ ref: viewportRef });
+  const frameTime = useRef(1);
+  const lastTime = useRef(1);
+
   const uniformTime = useRef(null);
   const uniformResolution = useRef(null);
 
@@ -130,7 +137,7 @@ export function WebGL() {
     onInit,
     onUpdate,
     height: 500,
-    width: 355,
+    width: bounds.width,
     contextType: "webgl2",
   });
 
@@ -168,10 +175,21 @@ export function WebGL() {
   }
 
   function onUpdate() {
-    uniformTime.current(time * 100);
+    frameTime.current = time - lastTime.current;
+    lastTime.current = time;
+
+    uniformTime.current(time);
     uniformResolution.current(width, height);
+    gl.viewport(0, 0, width, height);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
-  return <canvas ref={ref} />;
+  return (
+    <div ref={viewportRef}>
+      <div>FPS: {Math.round(1000 / frameTime.current)}</div>
+      <div>Frame time: {frameTime.current.toFixed(4)}</div>
+      <div>Time: {(time / 1000).toFixed(2)}</div>
+      <canvas ref={ref} />
+    </div>
+  );
 }

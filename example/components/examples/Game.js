@@ -46,7 +46,7 @@ export function Game() {
     const getProps = () => ({ x, y, size });
 
     const update = ({ time }) => {
-      x += Math.sin(time * 2);
+      x += Math.sin(time / 500);
       y += 0.75;
     };
 
@@ -226,5 +226,10 @@ export function Game() {
     width: 350,
   });
 
-  return <canvas ref={ref} />;
+  return (
+    <div>
+      <p>Controls: Arrows + a</p>
+      <canvas ref={ref} />
+    </div>
+  );
 }
