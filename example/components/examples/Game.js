@@ -32,13 +32,13 @@ const useInput = () => {
 export function Game() {
   const input = useInput();
 
-  let ENEMIES = [];
-  let BULLETS = [];
-  let PLAYER;
+  const ENEMIES = useRef([]);
+  const BULLETS = useRef([]);
+  const PLAYER = useRef(null);
 
-  const State = {
+  const State = useRef({
     gameOver: true,
-  };
+  });
 
   const Alien = (options, context) => {
     let { x, y, size = 10, speed = 2 } = options;
@@ -46,8 +46,8 @@ export function Game() {
     const getProps = () => ({ x, y, size });
 
     const update = ({ time }) => {
-      x += Math.sin(time * 0.05) / 2;
-      y += 0.25;
+      x += Math.sin(time / 500);
+      y += 0.75;
     };
 
     const draw = () => {
@@ -84,6 +84,8 @@ export function Game() {
   const Ship = (options, context) => {
     let { x, y, speed, size, isShooting = false } = options;
 
+    const getProps = () => ({ x, y, size });
+
     const update = ({ width }) => {
       if (input.current.includes("ArrowLeft")) {
         x = x <= 0 ? 0 : x - speed;
@@ -94,7 +96,7 @@ export function Game() {
       if (input.current.includes("a")) {
         if (!isShooting) {
           isShooting = true;
-          BULLETS.push(Bullet({ x: x, y }, context));
+          BULLETS.current.push(Bullet({ x: x, y }, context));
         }
       } else {
         isShooting = false;
@@ -109,15 +111,15 @@ export function Game() {
       context.closePath();
     };
 
-    return { update, draw };
+    return { update, draw, getProps };
   };
 
-  const setup = ({ context, height, width }) => {
+  const onInit = () => {
     // Make sure the enemies array is empty because rerender things :(
-    ENEMIES = [];
-    BULLETS = [];
+    ENEMIES.current = [];
+    BULLETS.current = [];
 
-    PLAYER = Ship(
+    PLAYER.current = Ship(
       { x: width / 2, y: height - 20, speed: 2, size: 20 },
       context
     );
@@ -129,12 +131,12 @@ export function Game() {
 
     for (let i = 1; i < col; i++) {
       for (let j = 1; j < row; j++) {
-        ENEMIES.push(Alien({ x: xc * i, y: yr * j }, context));
+        ENEMIES.current.push(Alien({ x: xc * i, y: yr * j }, context));
       }
     }
   };
 
-  const draw = ({ context, time, height, width }) => {
+  const onUpdate = () => {
     context.clearRect(0, 0, width, height);
     context.beginPath();
     context.rect(0, 0, width, height);
@@ -142,15 +144,11 @@ export function Game() {
     context.stroke();
     context.closePath();
 
-    if (ENEMIES.length <= 0) {
-      // Reset
-      setup({ context, height, width });
-      State.gameOver = true;
-    }
-
-    if (State.gameOver) {
+    if (State.current.gameOver) {
+      onInit();
       if (input.current.includes("Enter")) {
-        State.gameOver = false;
+        console.log("starting game");
+        State.current.gameOver = false;
       }
 
       context.textAlign = "center";
@@ -160,40 +158,60 @@ export function Game() {
       return;
     }
 
-    PLAYER.update({ height, width });
-    PLAYER.draw({ height, width });
+    if (ENEMIES.current.length <= 0) {
+      State.current.gameOver = true;
+    }
 
-    for (const [enemyIdx, enemy] of ENEMIES.entries()) {
+    PLAYER.current.update({ height, width });
+    PLAYER.current.draw({ height, width });
+
+    for (const [enemyIdx, enemy] of ENEMIES.current.entries()) {
       const enemyProps = enemy.getProps();
 
       // If enemy reaches the end end the game
       if (enemyProps.y >= height - enemyProps.size) {
-        State.gameOver = true;
+        State.current.gameOver = true;
       }
 
       enemy.update({ time });
       enemy.draw();
     }
 
-    for (const [bulletIdx, bullet] of BULLETS.entries()) {
+    for (const [enemyIdx, enemy] of ENEMIES.current.entries()) {
+      const enemyProps = enemy.getProps();
+      const playerProps = PLAYER.current.getProps();
+
+      if (
+        enemyProps.y > height ||
+        (enemyProps.y + enemyProps.size >= playerProps.y &&
+          enemyProps.y - enemyProps.size <= playerProps.y &&
+          enemyProps.x + enemyProps.size >= playerProps.x &&
+          enemyProps.x - enemyProps.size <= playerProps.x)
+      ) {
+        State.current.gameOver = true;
+      }
+    }
+
+    for (const [bulletIdx, bullet] of BULLETS.current.entries()) {
       const bulletProps = bullet.getProps();
 
       // Check if any bullets are hitting the enemy
-      for (const [enemyIdx, enemy] of ENEMIES.entries()) {
+      for (const [enemyIdx, enemy] of ENEMIES.current.entries()) {
         const enemyProps = enemy.getProps();
+
         if (
           enemyProps.y + enemyProps.size >= bulletProps.y &&
           enemyProps.y - enemyProps.size <= bulletProps.y &&
           enemyProps.x + enemyProps.size >= bulletProps.x &&
           enemyProps.x - enemyProps.size <= bulletProps.x
         ) {
-          BULLETS.splice(bulletIdx, 1);
-          ENEMIES.splice(enemyIdx, 1);
+          BULLETS.current.splice(bulletIdx, 1);
+          ENEMIES.current.splice(enemyIdx, 1);
         }
       }
 
       if (bulletProps.y <= 0) {
-        BULLETS.splice(bulletIdx, 1);
+        BULLETS.current.splice(bulletIdx, 1);
       }
 
       bullet.update();
@@ -201,11 +219,17 @@ export function Game() {
     }
   };
 
-  const { ref } = useCanvas({
-    setup,
-    draw,
-    options: { height: 600, width: 350 },
+  const { ref, time, context, height, width, reset } = useCanvas({
+    onInit,
+    onUpdate,
+    height: 600,
+    width: 350,
   });
 
-  return <canvas ref={ref} />;
+  return (
+    <div>
+      <p>Controls: Arrows + a</p>
+      <canvas ref={ref} />
+    </div>
+  );
 }

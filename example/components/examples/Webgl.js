@@ -1,5 +1,8 @@
 "use client";
+
+import { useRef } from "react";
 import { useCanvas } from "@kirkegaard/react-use-canvas";
+import { useBoundingBox } from "hooks/useBoundingBox";
 
 const vs = `#version 300 es
 
@@ -37,7 +40,8 @@ void main() {
 
     for(float i = 0., e = 0., j = 0.; i++ < 35.0 * 1.0;) {
       p = d * j / 0.6;
-      p.z += 1.0 + u_time / 1. * 0.006;
+      // p.z += 1.0 + u_time / 10. * 0.006;
+      p.z += 1.0 + u_time / 1000.;
       p.xy -= PI;
       p = asin(sin(p / 2.) * .8) * 1.2;
       float sc = .4 * 0.65;
@@ -115,10 +119,29 @@ function createUniform(gl, program, type, name) {
 }
 
 export function WebGL() {
-  let uniformTime = null;
-  let uniformResolution = null;
+  const viewportRef = useRef(null);
+  const bounds = useBoundingBox({ ref: viewportRef });
+  const frameTime = useRef(1);
+  const lastTime = useRef(1);
 
-  const setup = ({ context: gl, width, height }) => {
+  const uniformTime = useRef(null);
+  const uniformResolution = useRef(null);
+
+  const {
+    ref,
+    time,
+    context: gl,
+    height,
+    width,
+  } = useCanvas({
+    onInit,
+    onUpdate,
+    height: 500,
+    width: bounds.width,
+    contextType: "webgl2",
+  });
+
+  function onInit() {
     const vertexShader = compileShader(gl, vs, gl.VERTEX_SHADER);
     const fragmentShader = compileShader(gl, fs, gl.FRAGMENT_SHADER);
     const program = createProgram(gl, vertexShader, fragmentShader);
@@ -139,31 +162,34 @@ export function WebGL() {
     gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     gl.viewport(0, 0, width, height);
 
-    uniformTime = createUniform(gl, program, "1f", "u_time");
-    uniformResolution = createUniform(gl, program, "2f", "u_resolution");
+    uniformTime.current = createUniform(gl, program, "1f", "u_time");
+    uniformResolution.current = createUniform(
+      gl,
+      program,
+      "2f",
+      "u_resolution"
+    );
 
     gl.useProgram(program);
     gl.bindVertexArray(vao);
-  };
+  }
 
-  const draw = ({ context: gl, time, width, height }) => {
-    uniformTime(time);
-    uniformResolution(width, height);
+  function onUpdate() {
+    frameTime.current = time - lastTime.current;
+    lastTime.current = time;
+
+    uniformTime.current(time);
+    uniformResolution.current(width, height);
+    gl.viewport(0, 0, width, height);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-  };
+  }
 
-  const { ref } = useCanvas({
-    setup,
-    draw,
-    options: {
-      height: 500,
-      width: 355,
-      contextType: "webgl2",
-      contextAttributes: {
-        antialias: false,
-      },
-    },
-  });
-
-  return <canvas ref={ref} />;
+  return (
+    <div ref={viewportRef}>
+      <div>FPS: {Math.round(1000 / frameTime.current)}</div>
+      <div>Frame time: {frameTime.current.toFixed(4)}</div>
+      <div>Time: {(time / 1000).toFixed(2)}</div>
+      <canvas ref={ref} />
+    </div>
+  );
 }
