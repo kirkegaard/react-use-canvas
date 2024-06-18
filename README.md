@@ -22,10 +22,40 @@ Check the [example folder](https://github.com/kirkegaard/react-use-canvas/tree/m
 
 ```jsx
 function Example() {
-  const setup = ({ context, height, width }) => {};
-  const draw = ({ context, time, height, width }) => {};
+  const { ref, context, time, height, width } = useCanvas({ 
+    // The initial setup function
+    onInit,
 
-  const { ref } = useCanvas({ setup, draw });
+    // Called every update interval
+    onUpdate,
+
+    // Called every completed loop. Return an object to loop the animation.
+    onComplete,
+
+    // The frame to start the animation at
+    startAt: 0,
+
+    // Duration of the animation
+    duration: 2000,
+
+    // Dimensions of the canvas 
+    width: 300,
+    height: 150,
+
+    // The update interval or FPS if you want
+    updateInterval: 1 / 120
+  });
+
+  function onInit () {}
+
+  function onUpdate () {}
+
+  function onComplete () {
+    return {
+      shouldRepeat: true,
+      newStartAt: 1000
+    }
+  }
 
   return <canvas ref={ref} />;
 }

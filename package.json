@@ -5,10 +5,11 @@
   "author": "Christian Kirkegaard <christian@lowpoly.dk>",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
@@ -32,12 +33,12 @@
     "lint": "eslint src"
   },
   "devDependencies": {
-    "bunchee": "^4.2.11",
-    "eslint": "^8.56.0",
+    "bunchee": "^5.2.1",
+    "eslint": "^9.5.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.1.1"
+    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "prettier": "^3.3.2"
   },
   "peerDependencies": {
     "react": "^16.8.0  || ^17.0.0 || ^18.0.0"

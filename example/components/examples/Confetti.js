@@ -4,15 +4,11 @@ import { useState, useRef } from "react";
 import styled from "styled-components";
 
 import { useWindowSize } from "@uidotdev/usehooks";
-import { useCanvas } from "@kirkegaard/react-use-canvas";
-
-export const randomInteger = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
-export const randomFloat = (min, max) => {
-  return Math.random() * (max - min) + min;
-};
+import {
+  useCanvas,
+  getRandomIntegerBetween,
+  getRandomFloatBetween,
+} from "@kirkegaard/react-use-canvas";
 
 const Input = styled.input`
   display: flex;
@@ -93,14 +89,14 @@ export const Confetti = () => {
     for (let i = 0; i < particleCount; i++) {
       PARTICLES.current.push(
         Particle({
-          x: randomFloat(SIZE * 2, width - SIZE * 2),
-          y: randomFloat(-SIZE, -50),
-          r: (randomFloat(0, 360) * Math.PI) / 180,
-          color: randomInteger(30, 80), // actually light but hsl
-          velocityX: randomFloat(-4, 4),
-          velocityY: randomFloat(-8, -2),
-          gravity: randomFloat(0.05, 0.5),
-          type: randomInteger(1, 2),
+          x: getRandomFloatBetween(SIZE * 2, width - SIZE * 2),
+          y: getRandomFloatBetween(-SIZE, -50),
+          r: (getRandomFloatBetween(0, 360) * Math.PI) / 180,
+          color: getRandomIntegerBetween(30, 80), // actually light but hsl
+          velocityX: getRandomFloatBetween(-4, 4),
+          velocityY: getRandomFloatBetween(-8, -2),
+          gravity: getRandomFloatBetween(0.05, 0.5),
+          type: getRandomIntegerBetween(1, 2),
         })
       );
     }
