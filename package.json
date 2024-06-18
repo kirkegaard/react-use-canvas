@@ -1,6 +1,6 @@
 {
   "name": "@kirkegaard/react-use-canvas",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A tiny hook to render canvas",
   "author": "Christian Kirkegaard <christian@lowpoly.dk>",
   "main": "./dist/index.js",
