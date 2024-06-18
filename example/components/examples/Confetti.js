@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import styled from "styled-components";
 
 import { useWindowSize } from "@uidotdev/usehooks";
